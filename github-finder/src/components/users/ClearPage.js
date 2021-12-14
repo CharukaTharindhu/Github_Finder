@@ -1,19 +1,17 @@
-import React from 'react';
-import propTypes from 'prop-types';
+import React, { useContext } from 'react';
+import GithubContext from '../../context/github/GithubContext';
 
-function ClearPage(props) {
-  ClearPage.prototype = {
-    clearUser: propTypes.func.isRequired,
-    showClear: propTypes.bool.isRequired,
-  };
+function ClearPage() {
+  const { clearUser, users } = useContext(GithubContext);
+
   const onSubmit = (e) => {
-    props.clearUser();
+    clearUser();
   };
 
   return (
     <div>
       <form onSubmit={onSubmit} className='form'>
-        {props.showClear && (
+        {users.length > 0 && (
           <input
             type='submit'
             value='Clear Page'

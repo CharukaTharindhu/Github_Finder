@@ -1,69 +1,109 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import React, { Fragment, useEffect,useContext } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import Spinner from './../layouts/Spinner';
-
-const userStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(3 , 1fr)',
-  gridGap: '1rem',
-};
+import Repos from '../repos/Repos';
+import GithubContext from '../../context/github/GithubContext';
 
 const User = () => {
-  const { login } = useParams(); // use to access url parameters in functional component
-
-  const [userDate, setUser] = useState({
-    name: '',
-    avatar_url: '',
-    location: '',
-    bio: '',
-    blog: '',
-    login: '',
-    html_url: '',
-    followers: '',
-    following: '',
-    public_repo: '',
-    public_gists: '',
-    hireable: '',
-  });
-  const [loading, setLoading] = useState(false);
-
-  const getGitHubUser = async (userName) => {
-    setLoading(true);
-    const user = await axios.get(
-      `https://api.github.com/users/${userName}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-    );
-    setUser({
-      name: user.data.name,
-      avatar_url: user.data.avatar_url,
-      location: user.data.location,
-      bio: user.data.bio,
-      blog: user.data.blog,
-      login: user.data.login,
-      html_url: user.data.html_url,
-      followers: user.data.followers,
-      following: user.data.following,
-      public_repos: user.data.public_repos,
-      public_gists: user.data.public_gists,
-      hireable: user.data.hireable,
-    }); // this is how set value for array state
-
-    setLoading(false);
-  };
+  const { getGitHubUser,user,loading,getUserRepos } = useContext(GithubContext);
+  const { logins } = useParams(); // use to access url parameters in functional component
 
   useEffect(() => {
-    getGitHubUser(login);
+    getGitHubUser(logins);
+    getUserRepos(logins);
+    // eslint-disable-next-line 
   }, []);
+
+  const {
+    name,
+    avatar_url,
+    location,
+    bio,
+    blog,
+    login,
+    html_url,
+    followers,
+    following,
+    public_repos,
+    public_gists,
+    hireable,
+    company,
+  } = user;
   return (
     <Fragment>
       {loading ? (
         <Spinner />
       ) : (
-        <div>
-          <div style={userStyle}>
-            <h1>User : {userDate.name}</h1>
+        <Fragment>
+          <Link to='/' className='btn btn-light'>
+            Back To Search
+          </Link>
+          Hireable :{' '}
+          {hireable ? (
+            <i className='fas fa-check text-success' />
+          ) : (
+            <i className='fas fa-times-circle text-danger' />
+          )}
+          <div className='card grid-2'>
+            <div className='all-center'>
+              <img
+                src={avatar_url}
+                className='round-img'
+                alt=''
+                style={{ width: '150px' }}
+              ></img>
+              <h1>{name}</h1>
+              <p>Location : {location}</p>
+            </div>
+            <div>
+              {bio && (
+                <Fragment>
+                  <h3>Bio</h3>
+                  <p>{bio}</p>
+                </Fragment>
+              )}
+              <a href={html_url} className='btn btn-dark my-1'>
+                {' '}
+                Visit Github Profile
+              </a>
+              <ul>
+                <li>
+                  {login && (
+                    <Fragment>
+                      <strong>User Name : </strong> {login}
+                    </Fragment>
+                  )}
+                </li>
+                <li>
+                  {company && (
+                    <Fragment>
+                      <strong>Company : </strong> {company}
+                    </Fragment>
+                  )}
+                </li>
+                <li>
+                  {blog && (
+                    <Fragment>
+                      <strong>Website : </strong> {blog}
+                    </Fragment>
+                  )}
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
+          <div className='card text-center'>
+            <div className='badge badge-primary'> Followers : {followers}</div>
+            <div className='badge badge-success'> Following : {following}</div>
+            <div className='badge badge-light'>
+              Public Repos : {public_repos}
+            </div>
+            <div className='badge badge-dark'>
+              {' '}
+              Public Gists : {public_gists}
+            </div>
+          </div>
+          <Repos/>
+        </Fragment>
       )}
     </Fragment>
   );

@@ -5,23 +5,29 @@ import Navbar from './components/layouts/Navbar';
 import About from './components/pages/About';
 import User from './components/users/User';
 import Users from './components/users/Users';
+import GithubState from './context/github/GithubState';
+import AlertState from './context/alert/AlertState';
 
 const App = () => {
   return (
-    <Router>
-      <div className='app'>
-        <Navbar title='GitHub Finder' />
-        <div className='container'>
-          <Switch>
-            <Fragment>
-              <Route path='/' exact component={Users}></Route>
-              <Route path='/about' exact component={About}></Route>
-              <Route path='/user/:login' exact component={User}></Route>
-            </Fragment>
-          </Switch>
+    <GithubState>
+    <AlertState>
+      <Router>
+        <div className='app'>
+          <Navbar title='GitHub Finder' />
+          <div className='container'>
+            <Switch>
+              <Fragment>
+                <Route path='/' exact component={Users}></Route>
+                <Route path='/about' exact component={About}></Route>
+                <Route path='/user/:logins' exact component={User}></Route>
+              </Fragment>
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+      </AlertState>
+    </GithubState>
   );
 };
 
